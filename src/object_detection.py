@@ -21,8 +21,6 @@ def build_argparser():
     parser.add_argument('-l', '--cpu_extension', help='MKLDNN \
         (CPU)-targeted custom layers.Absolute path to a shared library \
         with the kernels implementation', type=str, default=None)
-    parser.add_argument('-pp', '--plugin_dir', help='Path to a plugin \
-        folder', type=str, default=None)
     parser.add_argument('-d', '--device', help='Specify the target \
         device to infer on; CPU, GPU, FPGA or MYRIAD is acceptable. \
         Sample will look for a suitable plugin for device specified \
@@ -34,7 +32,7 @@ def build_argparser():
     return parser
 
 
-def prepare_model(model, weights, cpu_extension, device, plugin_dirs, log):
+def prepare_model(model, weights, cpu_extension, device, log):
     model_xml = model
     model_bin = weights
 
@@ -127,8 +125,6 @@ def detection_output(input_data, output_folder, pred, classes_file, log):
     classes = [line.rstrip('\n') for line in open(classes_file)]
     threshold = 0.5
 
-    print(len(pred), pred[0].shape)
-
     for im_id, data in enumerate(pred):
         img_name = input_data[im_id]
         img = cv2.imread(img_name)
@@ -155,7 +151,7 @@ def main():
     args = build_argparser().parse_args()
     try:
         net, ie = prepare_model(args.model, args.weights,
-            args.cpu_extension, args.device, args.plugin_dir, log)
+            args.cpu_extension, args.device, log)
 
         data = get_image_list(args.input, log)
         images = convert_images(net, data, log)
